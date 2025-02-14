@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Ranchers&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aldrich&display=swap');
+
+
+:root{
+    --text-color: #2F3A47;
+    --background-color: #E6E8E6;
+    --accent-color: #BCEDF6;  
+    --header-color: #5E8C61;
+    --heading-font: "Ranchers";
+    --paragraph-font: Aldrich, Helvetica, sans-serif;
+}
