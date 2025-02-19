@@ -42,6 +42,13 @@ header{
     justify-content: center;
 }
 
+.ConditionCurrentImg{
+    animation-name: weathericonanimcurrent;
+    animation-duration: 6s;
+    animation-iteration-count: infinite;
+    position: relative;
+}
+
 .ConditionCurrentText{
     padding-top: 8%;
     margin-right: 1%;
@@ -61,6 +68,13 @@ header{
  grid-row: auto;
 }
 
+
+.HourlyWeatherConditions img{
+    animation-name: weathericonanimhour;
+    animation-duration: 6s;
+    animation-iteration-count: infinite;
+    position: relative;
+}
 .DailyForecastandDetailedConditions{
     display: grid;
     grid-auto-flow: column;
@@ -108,3 +122,14 @@ footer{
 }
 
 
+@keyframes weathericonanimcurrent{ 
+    0% {top: 0px}
+    50% {top: 5px}
+    100% {top: 0px}
+}
+
+@keyframes weathericonanimhour{ 
+    0% {left: 0px}
+    50% {left: 5px}
+    100% {left: 0px}
+}
