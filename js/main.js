@@ -13,6 +13,7 @@ import {
 
 // DOM elements
 const searchForm = document.getElementById('search-form');
+const logo = document.getElementById('logo');
 const locationInput = document.getElementById('location-input');
 const errorContainer = document.getElementById('search-error');
 
@@ -183,6 +184,14 @@ function updateHourlyForecast(data) {
     })
     .slice(0, 9);
 
+    if (currentHout < 13){
+      logo.setAttribute('src', 'assets\icon day.png');
+    }
+    else if (currentHour > 12){
+      logo.setAttribute('src', 'assets\\icon night.png');
+    } else {
+      logo.setAttribute('src', 'assets\\icon weird.png');
+    }
   // adds the next day's hours if the current day's hours are less than 9
   if (hourlyForecast.length < 9 && data.forecast.forecastday.length > 1) {
     const nextDayHours = data.forecast.forecastday[1].hour.slice(0, 9 - hourlyForecast.length);
