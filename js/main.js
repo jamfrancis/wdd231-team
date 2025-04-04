@@ -184,10 +184,10 @@ function updateHourlyForecast(data) {
     })
     .slice(0, 9);
 
-    if (currentHout < 13){
+    if (currentHout > 19 || currentHout < 6){
       logo.setAttribute('src', 'assets\icon day.png');
     }
-    else if (currentHour > 12){
+    else if (currentHour >= 13 && currentHour < 19){
       logo.setAttribute('src', 'assets\\icon night.png');
     } else {
       logo.setAttribute('src', 'assets\\icon weird.png');
