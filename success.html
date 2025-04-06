@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Submitted - Weather App</title>
+    <link rel="stylesheet" href="css/color-pallete-and-fonts.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <header class="simplified-header">
+        <a href="/" class="logo-link">
+            <img src="assets/logo.png" alt="Weather App Logo" class="logo">
+        </a>
+    </header>
+
+    <main class="success-container">
+        <div class="success-message">
+            <h1>Thank You!</h1>
+            <p>Your feedback has been successfully submitted.</p>
+            <a href="/" class="home-link">Return to Homepage</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p class="copyright">© 2025 Hazelwood & Francis</p>
+            <a class="contact-link" href="contact.html" aria-label="Contact us">Contact us</a>
+        </div>
+    </footer>
+
+    <script>
+        // Update copyright year
+        document.querySelector('.copyright').textContent = `© ${new Date().getFullYear()} Hazelwood & Francis`;
+    </script>
+</body>
+</html> 
