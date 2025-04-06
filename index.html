@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-    <title>Continent: A weather website</title>
+    <title>Continent: A Weather Website</title>
     <link type="text/css" rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
     <header>
-        <img class="logo" src="assets\icon day.png" alt="logo"
+        <img class="logo" src="https://cdn.jim-nielsen.com/ios/512/weather-2021-12-07.png?rf=1024" alt="logo"
             width="5%">
         <form id="search-form" class="input" aria-label="Search for a location">
             <div class="search-container">
@@ -30,96 +30,127 @@
                     <span class="unit celsius">°C</span>
                 </label>
             </div>
-            <a class="LinkHeadInside" id="dropdown" href="#">dropdown</a>
-            <a class="LinkHeadInside" id="contact" href="#">contact</a>
-        </section>
+        </div>
+        <div class="input">
+            <form class="search-container" id="searchForm">
+                <input type="text" id="searchInput" placeholder="Enter city name or zip code" required autocomplete="off">
+                <button type="submit" aria-label="Search">
+                    <span class="search-arrow">→</span>
+                </button>
+            </form>
+            <div class="recent-searches-container" id="recentSearches">
+                <div class="recent-searches-header">
+                    <h3>Recent Searches</h3>
+                </div>
+                <ul class="recent-searches-list" id="recentSearchesList"></ul>
+            </div>
+        </div>
+        <div class="header-right">
+            <a class="LinkHeadInside" id="contact" href="contact.html">Contact us</a>
+        </div>
     </header>
     <main>
-        <section class="CurrentWeatherCondition">
-            <h1 class="ConditionCurrentText">Loading weather data...</h1>
-            <img class="ConditionCurrentImg" src="assets/sunny.png" alt="current weather condition" width="20%">
-        </section>
-        <section class="HourlyWeatherCondition">
-            <h1 class="ConditionHourly">Hourly Forecast</h1>
-            <section class="HourlyWeatherConditions">
-                <section class="hourcondition" id="1">
-                    <img class="ConditionHourImg" id="1" src="assets/sunny.png" alt="hourly weather condition 1"
-                        width="50%">
-                    <p class="data" id="1">Loading...</p>
-                </section>
-                <section class="hourcondition" id="2">
-                    <img class="ConditionHourImg" id="2" src="assets/sunny.png" alt="hourly weather condition 2"
-                        width="50%">
-                    <p class="data" id="2">Loading...</p>
-                </section>
-                <section class="hourcondition" id="3">
-                    <img class="ConditionHourImg" id="3" src="assets/sunny.png" alt="hourly weather condition 3"
-                        width="50%">
-                    <p class="data" id="3">Loading...</p>
-                </section>
-                <section class="hourcondition" id="4">
-                    <img class="ConditionHourImg" id="4" src="assets/sunny.png" alt="hourly weather condition 4"
-                        width="50%">
-                    <p class="data" id="4">Loading...</p>
-                </section>
-                <section class="hourcondition" id="5">
-                    <img class="ConditionHourImg" id="5" src="assets/sunny.png" alt="hourly weather condition 5"
-                        width="50%">
-                    <p class="data" id="5">Loading...</p>
-                </section>
-                <section class="hourcondition" id="6">
-                    <img class="ConditionHourImg" id="6" src="assets/sunny.png" alt="hourly weather condition 6"
-                        width="50%">
-                    <p class="data" id="6">Loading...</p>
-                </section>
-                <section class="hourcondition" id="7">
-                    <img class="ConditionHourImg" id="7" src="assets/sunny.png" alt="hourly weather condition 7"
-                        width="50%">
-                    <p class="data" id="7">Loading...</p>
-                </section>
-                <section class="hourcondition" id="8">
-                    <img class="ConditionHourImg" id="8" src="assets/sunny.png" alt="hourly weather condition 8"
-                        width="50%">
-                    <p class="data" id="8">Loading...</p>
-                </section>
-                <section class="hourcondition" id="9">
-                    <img class="ConditionHourImg" id="9" src="assets/sunny.png" alt="hourly weather condition 9"
-                        width="50%">
-                    <p class="data" id="9">Loading...</p>
-                </section>
-            </section>
-        </section>
-
-        <section class="DailyForecastandDetailedConditions">
-            <section class="DailyForecast">
-                <h1 class="ForcastDailyH1">7-Day Forecast</h1>
-                <!-- Daily forecast items will be populated by JavaScript -->
-                <li class="ForcastDailyinfo" id="1">Loading forecast data...</li>
-                <!-- Repeat for all forecast days -->
+        <div class="weather-grid">
+            <!-- Left Rectangle - Current Conditions -->
+            <section class="current-conditions">
+                <h2>Current Conditions</h2>
+                <div class="condition-cards">
+                    <div class="condition-card">
+                        <span class="condition-label">Feels Like</span>
+                        <span class="condition-value" id="feels-like">--°</span>
+                    </div>
+                    <div class="condition-card">
+                        <span class="condition-label">Humidity</span>
+                        <span class="condition-value" id="humidity">--%</span>
+                    </div>
+                    <div class="condition-card">
+                        <span class="condition-label">Wind Speed</span>
+                        <span class="condition-value" id="wind-speed">-- mph</span>
+                    </div>
+                </div>
             </section>
 
-            <section class="DetailedConditions">
-                <h1 class="ConditionDetailH1">Current Conditions</h1>
-                <!-- Detailed condition items will be populated by JavaScript -->
-                <li class="ConditionDetailinfo" id="1">Loading conditions data...</li>
-                <!-- Repeat for all condition items -->
+            <!-- Middle Rectangle - Main Weather -->
+            <section class="main-weather">
+                <div class="location-header">
+                    <h1 class="location-name">Loading...</h1>
+                    <button id="favorite-button" class="favorite-button" aria-label="Set as favorite location">
+                        <span class="favorite-icon">★</span>
+                    </button>
+                </div>
+                <div class="current-temp">--°</div>
+                <img class="weather-icon" src="assets/sunny.png" alt="current weather condition">
+                <div class="weather-condition">Loading...</div>
             </section>
+
+            <!-- Right Rectangle - 7-Day Forecast -->
+            <section class="weekly-forecast">
+                <h2>5-Day Forecast</h2>
+                <div class="forecast-cards">
+                    <!-- Forecast cards will be populated by JavaScript -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Hourly Forecast Section -->
+        <section class="hourly-forecast">
+            <h2>Hourly Forecast</h2>
+            <div class="hourly-scroll-container">
+                <div class="hourly-timeline">
+                    <div class="hour-block" id="1">
+                        <span class="time">Now</span>
+                        <img class="ConditionHourImg" src="assets/sunny.png" alt="current weather condition">
+                        <span class="temperature">--°</span>
+                    </div>
+                    <div class="hour-block" id="2">
+                        <span class="time">--:--</span>
+                        <img class="ConditionHourImg" src="assets/sunny.png" alt="hourly weather condition">
+                        <span class="temperature">--°</span>
+                    </div>
+                    <div class="hour-block" id="3">
+                        <span class="time">--:--</span>
+                        <img class="ConditionHourImg" src="assets/sunny.png" alt="hourly weather condition">
+                        <span class="temperature">--°</span>
+                    </div>
+                    <div class="hour-block" id="4">
+                        <span class="time">--:--</span>
+                        <img class="ConditionHourImg" src="assets/sunny.png" alt="hourly weather condition">
+                        <span class="temperature">--°</span>
+                    </div>
+                    <div class="hour-block" id="5">
+                        <span class="time">--:--</span>
+                        <img class="ConditionHourImg" src="assets/sunny.png" alt="hourly weather condition">
+                        <span class="temperature">--°</span>
+                    </div>
+                    <div class="hour-block" id="6">
+                        <span class="time">--:--</span>
+                        <img class="ConditionHourImg" src="assets/sunny.png" alt="hourly weather condition">
+                        <span class="temperature">--°</span>
+                    </div>
+                    <div class="hour-block" id="7">
+                        <span class="time">--:--</span>
+                        <img class="ConditionHourImg" src="assets/sunny.png" alt="hourly weather condition">
+                        <span class="temperature">--°</span>
+                    </div>
+                    <div class="hour-block" id="8">
+                        <span class="time">--:--</span>
+                        <img class="ConditionHourImg" src="assets/sunny.png" alt="hourly weather condition">
+                        <span class="temperature">--°</span>
+                    </div>
+                    <div class="hour-block" id="9">
+                        <span class="time">--:--</span>
+                        <img class="ConditionHourImg" src="assets/sunny.png" alt="hourly weather condition">
+                        <span class="temperature">--°</span>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
     <footer>
-        <section class="legal1">
-            <li>legal info goes here</li>
-            <li>for example:</li>
-            <li>"this website isn't responsible for any rage you might have"</li>
-        </section>
-        <section class="legal2">
-            <li>legal info goes here</li>
-            <li>for example:</li>
-            <li>"this website isn't responsible for any rage you might have"</li>
-        </section>
-        <a class="contact" id="contact" href="#">
-            contact us
-        </a>
+        <div class="footer-content">
+            <p class="copyright">© 2025 Hazelwood & Francis</p>
+            <a class="contact-link" href="contact.html" aria-label="Contact us">Contact us</a>
+        </div>
     </footer>
 
     <!-- Loading indicator -->
