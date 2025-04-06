@@ -8,23 +8,10 @@
 
 <body>
     <header>
-        <audio autoplay loop>
-            <source src="wdd231-team\assets\LocalForecastElevator.wav" type="audio/wav" />
-          </audio>          
-        <img class="logo" src="https://cdn.jim-nielsen.com/ios/512/weather-2021-12-07.png?rf=1024" alt="logo"
-            width="5%">
-        <form id="search-form" class="input" aria-label="Search for a location">
-            <div class="search-container">
-                <label for="location-input" class="visually-hidden">Enter city or zip code</label>
-                <input type="text" id="location-input" name="location" placeholder="Enter city or zip code"
-                    aria-required="true">
-                <button type="submit" aria-label="Search">
-                    <span class="visually-hidden">Search</span>
-                </button>
-            </div>
-            <div id="search-error" class="error-message" aria-live="polite"></div>
-        </form>
-        <section class="LinkHead">
+        <div class="header-left">
+            <a href="https://jamfrancis.github.io/wdd231-team/" class="logo-link">
+                <img class="logo" src="assets/logo.png" alt="logo" width="5%">
+            </a>
             <div class="temperature-toggle">
                 <label for="unit-toggle" class="toggle-label">
                     <span class="unit fahrenheit">°F</span>
@@ -53,6 +40,9 @@
         </div>
     </header>
     <main>
+        <audio autoplay loop>
+            <source src="wdd231-team\assets\LocalForecastElevator.wav" type="audio/wav" />
+          </audio>          
         <div class="weather-grid">
             <!-- Left Rectangle - Current Conditions -->
             <section class="current-conditions">
