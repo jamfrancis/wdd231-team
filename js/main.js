@@ -12,12 +12,15 @@ import {
 } from './modules/templates.js';
 
 // DOM elements
-const searchForm = document.getElementById('search-form');
-const locationInput = document.getElementById('location-input');
-const errorContainer = document.getElementById('search-error');
-
-// Add event listeners
-searchForm.addEventListener('submit', handleSearch);
+let searchForm;
+let searchInput;
+let errorContainer;
+let favoriteButton;
+let unitToggle;
+let fahrenheitUnit;
+let celsiusUnit;
+let recentSearchesContainer;
+let recentSearchesList;
 
 // Constants
 const DEFAULT_LOCATION = "Rexburg, Idaho";
@@ -232,8 +235,8 @@ function updateURL(location) {
 // Weather data loading and display
 async function loadWeatherData(location) {
     try {
-        console.log('Loading weather data for:', location);
         showLoading();
+        console.log('Loading weather data for:', location);
         
         // Fetch both current and forecast data
         const [currentData, forecastData] = await Promise.all([
@@ -253,10 +256,11 @@ async function loadWeatherData(location) {
         
         updateWeatherDisplay(data);
         updateFavoriteButton(location);
-        addToRecentSearches(location); // Add to recent searches
+        addToRecentSearches(location);
         hideLoading();
     } catch (error) {
         console.error('Error loading weather data:', error);
+        displayError('Failed to load weather data. Please try again.');
         hideLoading();
     }
 }
@@ -326,38 +330,36 @@ function updateHourlyForecast(data) {
         })
         .slice(0, 11);
 
-  // adds the next day's hours if the current day's hours are less than 9
-  if (hourlyForecast.length < 9 && data.forecast.forecastday.length > 1) {
-    const nextDayHours = data.forecast.forecastday[1].hour.slice(0, 9 - hourlyForecast.length);
-    hourlyForecast.push(...nextDayHours);
-  }
+    // Add current hour to the beginning
+    const hourlyForecast = [currentHour, ...next11Hours];
 
-  // update each hour's display
-  const hourlyContainers = document.querySelectorAll('.hourcondition');
-  hourlyForecast.forEach((hour, index) => {
-    if (index < hourlyContainers.length) {
-      const container = hourlyContainers[index];
-      const img = container.querySelector('.ConditionHourImg');
-      const text = container.querySelector('.data');
-
-      // format the time
-      const hourTime = new Date(hour.time).getHours();
-      const formattedTime = hourTime === 0 ? '12 AM' :
-        hourTime < 12 ? `${hourTime} AM` :
-          hourTime === 12 ? '12 PM' :
-            `${hourTime - 12} PM`;
-
-      // get temperature based on user preference
-      const temp = getTemperatureUnit() === 'celsius'
-        ? `${hour.temp_c}°C`
-        : `${hour.temp_f}°F`;
-
-      // update elements
-      img.src = hour.condition.icon;
-      img.alt = hour.condition.text;
-      text.textContent = `${formattedTime}: ${temp}`;
+    // Add next day's hours if needed
+    if (hourlyForecast.length < 12 && data.forecast.forecastday.length > 1) {
+        const nextDayHours = data.forecast.forecastday[1].hour.slice(0, 12 - hourlyForecast.length);
+        hourlyForecast.push(...nextDayHours);
     }
-  });
+
+    // Create and append hourly forecast items
+    hourlyForecast.forEach(hour => {
+        const hourBlock = document.createElement('div');
+        hourBlock.className = 'hour-block';
+        
+        const time = new Date(hour.time);
+        const formattedTime = time.getHours() === 0 ? '12 AM' :
+            time.getHours() < 12 ? `${time.getHours()} AM` :
+            time.getHours() === 12 ? '12 PM' :
+            `${time.getHours() - 12} PM`;
+
+        const temp = getTemperatureUnit() === 'celsius' ? `${Math.round(hour.temp_c)}°C` : `${Math.round(hour.temp_f)}°F`;
+
+        hourBlock.innerHTML = `
+            <span class="time">${formattedTime}</span>
+            <img class="ConditionHourImg" src="${hour.condition.icon}" alt="${hour.condition.text}">
+            <span class="temperature">${temp}</span>
+        `;
+        
+        hourlyForecastContainer.appendChild(hourBlock);
+    });
 }
 
 /**
