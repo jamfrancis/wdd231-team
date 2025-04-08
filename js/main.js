@@ -21,6 +21,12 @@ let fahrenheitUnit;
 let celsiusUnit;
 let recentSearchesContainer;
 let recentSearchesList;
+let hamburgerMenu;
+let mobileMenu;
+let closeMenu;
+let unitToggleMobile;
+let muteButton;
+let audioElement;
 
 // Constants
 const DEFAULT_LOCATION = "Rexburg, Idaho";
@@ -42,6 +48,18 @@ function initializeApp() {
     celsiusUnit = document.querySelector('.unit.celsius');
     recentSearchesContainer = document.getElementById('recentSearches');
     recentSearchesList = document.getElementById('recentSearchesList');
+    hamburgerMenu = document.querySelector('.hamburger-menu');
+    mobileMenu = document.querySelector('.mobile-menu');
+    closeMenu = document.querySelector('.close-menu');
+    unitToggleMobile = document.getElementById('unit-toggle-mobile');
+    muteButton = document.getElementById('muteButton');
+    audioElement = document.querySelector('audio');
+    
+    // Initialize features
+    initializeMuteButton();
+    initializeMobileMenu();
+    initializeSearch();
+    initializeTemperatureToggle();
     
     // Set up event listeners
     if (searchForm) {
@@ -92,18 +110,7 @@ function initializeApp() {
     }
     
     // Load initial data
-    const urlParams = new URLSearchParams(window.location.search);
-    const locationParam = urlParams.get('location');
-    
-    if (locationParam) {
-        loadWeatherData(locationParam);
-    } else {
-        const favoriteLocation = getFavoriteLocation() || DEFAULT_LOCATION;
-        loadWeatherData(favoriteLocation);
-    }
-    
-    // Initialize recent searches
-    loadRecentSearches();
+    loadInitialWeatherData();
 }
 
 // Function to update logo based on time of day
@@ -507,4 +514,149 @@ function hideRecentSearches() {
     if (recentSearchesContainer) {
         recentSearchesContainer.classList.remove('visible');
     }
+}
+
+// Hamburger menu functionality
+// Toggle mobile menu
+if (hamburgerMenu) {
+    hamburgerMenu.addEventListener('click', () => {
+        hamburgerMenu.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+    });
+}
+
+// Close mobile menu with X button
+if (closeMenu) {
+    closeMenu.addEventListener('click', () => {
+        hamburgerMenu.classList.remove('active');
+        mobileMenu.classList.remove('active');
+    });
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (mobileMenu?.classList.contains('active') && 
+        !hamburgerMenu?.contains(e.target) && 
+        !mobileMenu?.contains(e.target)) {
+        hamburgerMenu.classList.remove('active');
+        mobileMenu.classList.remove('active');
+    }
+});
+
+// Sync temperature toggles
+if (unitToggle && unitToggleMobile) {
+    unitToggle.addEventListener('change', () => {
+        unitToggleMobile.checked = unitToggle.checked;
+    });
+
+    unitToggleMobile.addEventListener('change', () => {
+        unitToggle.checked = unitToggleMobile.checked;
+    });
+}
+
+// Handle mobile search form
+const searchFormMobile = document.getElementById('searchFormMobile');
+const searchInputMobile = document.getElementById('searchInputMobile');
+
+if (searchFormMobile && searchInputMobile) {
+    searchFormMobile.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const searchQuery = searchInputMobile.value.trim();
+        if (searchQuery) {
+            searchWeather(searchQuery);
+            searchInputMobile.value = '';
+            hamburgerMenu.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        }
+    });
+}
+
+// Mute button functionality
+function initializeMuteButton() {
+    if (muteButton && audioElement) {
+        // Set initial state
+        audioElement.muted = false;
+        muteButton.textContent = 'Mute Site';
+
+        muteButton.addEventListener('click', () => {
+            audioElement.muted = !audioElement.muted;
+            muteButton.textContent = audioElement.muted ? 'Unmute Site' : 'Mute Site';
+        });
+    }
+}
+
+// Initialize mobile menu functionality
+function initializeMobileMenu() {
+    if (hamburgerMenu && mobileMenu && closeMenu) {
+        // Toggle mobile menu
+        hamburgerMenu.addEventListener('click', () => {
+            hamburgerMenu.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu with X button
+        closeMenu.addEventListener('click', () => {
+            hamburgerMenu.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (mobileMenu.classList.contains('active') && 
+                !hamburgerMenu.contains(e.target) && 
+                !mobileMenu.contains(e.target)) {
+                hamburgerMenu.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Initialize temperature toggle functionality
+function initializeTemperatureToggle() {
+    if (unitToggle && unitToggleMobile) {
+        // Sync temperature toggles
+        unitToggle.addEventListener('change', () => {
+            unitToggleMobile.checked = unitToggle.checked;
+        });
+
+        unitToggleMobile.addEventListener('change', () => {
+            unitToggle.checked = unitToggleMobile.checked;
+        });
+    }
+}
+
+// Initialize search functionality
+function initializeSearch() {
+    const searchFormMobile = document.getElementById('searchFormMobile');
+    const searchInputMobile = document.getElementById('searchInputMobile');
+
+    if (searchFormMobile && searchInputMobile) {
+        searchFormMobile.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const searchQuery = searchInputMobile.value.trim();
+            if (searchQuery) {
+                searchWeather(searchQuery);
+                searchInputMobile.value = '';
+                hamburgerMenu.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Load initial weather data
+function loadInitialWeatherData() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const locationParam = urlParams.get('location');
+    
+    if (locationParam) {
+        loadWeatherData(locationParam);
+    } else {
+        const favoriteLocation = getFavoriteLocation() || DEFAULT_LOCATION;
+        loadWeatherData(favoriteLocation);
+    }
+    
+    // Initialize recent searches
+    loadRecentSearches();
 }

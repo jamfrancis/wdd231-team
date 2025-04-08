@@ -12,7 +12,7 @@
             <a href="/wdd231-team" class="logo-link">
                 <img class="logo" src="assets/logo.png" alt="logo" width="5%">
             </a>
-            <div class="temperature-toggle">
+            <div class="temperature-toggle desktop-only">
                 <label for="unit-toggle" class="toggle-label">
                     <span class="unit fahrenheit">°F</span>
                     <input type="checkbox" id="unit-toggle" class="toggle-input">
@@ -36,7 +36,38 @@
             </div>
         </div>
         <div class="header-right">
-            <a class="LinkHeadInside" id="contact" href="contact.html">Contact us</a>
+            <a class="LinkHeadInside desktop-only" id="contact" href="contact.html">Contact us</a>
+            <button class="hamburger-menu" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+        <div class="mobile-menu">
+            <div class="mobile-menu-header">
+                <button class="close-menu" aria-label="Close menu">
+                    <span class="close-icon">×</span>
+                </button>
+            </div>
+            <div class="mobile-menu-content">
+                <form class="search-container mobile-only" id="searchFormMobile">
+                    <input type="text" id="searchInputMobile" placeholder="Enter city name or zip code" required autocomplete="off">
+                    <button type="submit" aria-label="Search">
+                        <span class="search-arrow">→</span>
+                    </button>
+                </form>
+                <div class="bottom-controls">
+                    <div class="temperature-toggle mobile-only">
+                        <label for="unit-toggle-mobile" class="toggle-label">
+                            <span class="unit fahrenheit">°F</span>
+                            <input type="checkbox" id="unit-toggle-mobile" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                            <span class="unit celsius">°C</span>
+                        </label>
+                    </div>
+                    <a class="LinkHeadInside mobile-only" id="contact-mobile" href="contact.html">Contact us</a>
+                </div>
+            </div>
         </div>
     </header>
     <main>
@@ -141,8 +172,11 @@
     </main>
     <footer>
         <div class="footer-content">
-            <p class="copyright">© 2025 Hazelwood & Francis</p>
-            <a class="contact-link" href="contact.html" aria-label="Contact us">Contact us</a>
+            <p class="copyright">© 2025 H&F</p>
+            <div class="footer-controls">
+                <button id="muteButton" class="mute-button">Mute Site</button>
+                <a class="contact-link" href="contact.html">Contact Us</a>
+            </div>
         </div>
     </footer>
 
