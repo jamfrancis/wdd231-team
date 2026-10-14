@@ -28,6 +28,9 @@ let unitToggleMobile;
 let muteButton;
 let audioElement;
 
+// Cached weather data for unit conversion re-renders
+let currentWeatherData = null;
+
 // Constants
 const DEFAULT_LOCATION = "Rexburg, Idaho";
 const DAY_START_HOUR = 6;  // 6 AM
@@ -87,6 +90,10 @@ function initializeApp() {
             const unit = unitToggle.checked ? 'celsius' : 'fahrenheit';
             saveTemperatureUnit(unit);
             updateUnitDisplay(unit);
+            // Re-render from original API data to avoid rounding drift
+            if (currentWeatherData) {
+                updateWeatherDisplay(currentWeatherData);
+            }
         });
     }
     
@@ -132,7 +139,7 @@ setInterval(updateLogoForTimeOfDay, 60000);
 // Call initializeApp when the page loads
 document.addEventListener('DOMContentLoaded', initializeApp);
 
-// Temperature unit toggle functionality
+// Temperature unit toggle — only updates the visual toggle state
 function updateUnitDisplay(unit) {
     if (fahrenheitUnit && celsiusUnit) {
         if (unit === 'celsius') {
@@ -143,41 +150,6 @@ function updateUnitDisplay(unit) {
             celsiusUnit.style.opacity = '0.5';
         }
     }
-    
-    // Update all temperature displays
-    const currentTemp = document.querySelector('.current-temp');
-    const feelsLike = document.getElementById('feels-like');
-    const hourlyTemps = document.querySelectorAll('.temperature');
-    const forecastTemps = document.querySelectorAll('.forecast-temp');
-    
-    // Update current temperature
-    if (currentTemp) {
-        const tempValue = parseInt(currentTemp.textContent);
-        const convertedTemp = unit === 'celsius' ? Math.round((tempValue - 32) * 5/9) : Math.round((tempValue * 9/5) + 32);
-        currentTemp.textContent = `${convertedTemp}°${unit === 'celsius' ? 'C' : 'F'}`;
-    }
-    
-    // Update feels like temperature
-    if (feelsLike) {
-        const feelsLikeValue = parseInt(feelsLike.textContent);
-        const convertedFeelsLike = unit === 'celsius' ? Math.round((feelsLikeValue - 32) * 5/9) : Math.round((feelsLikeValue * 9/5) + 32);
-        feelsLike.textContent = `${convertedFeelsLike}°${unit === 'celsius' ? 'C' : 'F'}`;
-    }
-    
-    // Update hourly temperatures
-    hourlyTemps.forEach(temp => {
-        const tempValue = parseInt(temp.textContent);
-        const convertedTemp = unit === 'celsius' ? Math.round((tempValue - 32) * 5/9) : Math.round((tempValue * 9/5) + 32);
-        temp.textContent = `${convertedTemp}°${unit === 'celsius' ? 'C' : 'F'}`;
-    });
-    
-    // Update forecast temperatures
-    forecastTemps.forEach(temp => {
-        const [high, low] = temp.textContent.split(' / ').map(t => parseInt(t));
-        const convertedHigh = unit === 'celsius' ? Math.round((high - 32) * 5/9) : Math.round((high * 9/5) + 32);
-        const convertedLow = unit === 'celsius' ? Math.round((low - 32) * 5/9) : Math.round((low * 9/5) + 32);
-        temp.textContent = `${convertedHigh}°${unit === 'celsius' ? 'C' : 'F'} / ${convertedLow}°${unit === 'celsius' ? 'C' : 'F'}`;
-    });
 }
 
 // Favorite location functionality
@@ -261,6 +233,8 @@ async function loadWeatherData(location) {
             forecast: forecastData.forecast
         };
         
+        // Store data so unit toggle can re-render from original values
+        currentWeatherData = data;
         updateWeatherDisplay(data);
         updateFavoriteButton(location);
         addToRecentSearches(location);
@@ -314,12 +288,8 @@ function updateHourlyForecast(data) {
     const hourlyForecastContainer = document.querySelector('.hourly-timeline');
     if (!hourlyForecastContainer) return;
 
-    // Clear existing content
-    hourlyForecastContainer.innerHTML = '';
-
-    // Get current time in the location's timezone
     const now = new Date();
-    const timezone = data.location.tz_id;
+    const unit = getTemperatureUnit();
 
     // Create current hour data from current conditions
     const currentHour = {
@@ -337,7 +307,6 @@ function updateHourlyForecast(data) {
         })
         .slice(0, 11);
 
-    // Add current hour to the beginning
     const hourlyForecast = [currentHour, ...next11Hours];
 
     // Add next day's hours if needed
@@ -346,27 +315,10 @@ function updateHourlyForecast(data) {
         hourlyForecast.push(...nextDayHours);
     }
 
-    // Create and append hourly forecast items
-    hourlyForecast.forEach(hour => {
-        const hourBlock = document.createElement('div');
-        hourBlock.className = 'hour-block';
-        
-        const time = new Date(hour.time);
-        const formattedTime = time.getHours() === 0 ? '12 AM' :
-            time.getHours() < 12 ? `${time.getHours()} AM` :
-            time.getHours() === 12 ? '12 PM' :
-            `${time.getHours() - 12} PM`;
-
-        const temp = getTemperatureUnit() === 'celsius' ? `${Math.round(hour.temp_c)}°C` : `${Math.round(hour.temp_f)}°F`;
-
-        hourBlock.innerHTML = `
-            <span class="time">${formattedTime}</span>
-            <img class="ConditionHourImg" src="${hour.condition.icon}" alt="${hour.condition.text}">
-            <span class="temperature">${temp}</span>
-        `;
-        
-        hourlyForecastContainer.appendChild(hourBlock);
-    });
+    // Build HTML using the template function
+    hourlyForecastContainer.innerHTML = hourlyForecast
+        .map((hour, index) => hourlyForecastTemplate(hour, unit, index === 0))
+        .join('');
 }
 
 /**
@@ -375,31 +327,15 @@ function updateHourlyForecast(data) {
  */
 function updateDailyForecast(data) {
     const forecastContainer = document.querySelector('.forecast-cards');
-    forecastContainer.innerHTML = '';
+    if (!forecastContainer) return;
     
+    const unit = getTemperatureUnit();
     // Skip today and tomorrow, take the next 7 days
     const forecastDays = data.forecast.forecastday.slice(2, 9);
     
-    forecastDays.forEach((day, index) => {
-        const date = new Date(day.date);
-        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-        const highTemp = Math.round(getTemperatureUnit() === 'celsius' ? day.day.maxtemp_c : day.day.maxtemp_f);
-        const lowTemp = Math.round(getTemperatureUnit() === 'celsius' ? day.day.mintemp_c : day.day.mintemp_f);
-        const condition = day.day.condition.text;
-        const icon = day.day.condition.icon;
-        
-        const forecastCard = document.createElement('div');
-        forecastCard.className = 'forecast-card';
-        forecastCard.innerHTML = `
-            <div class="forecast-date">${dayName}</div>
-            <img src="${icon}" alt="${condition}" class="forecast-icon">
-            <div class="forecast-details">
-                <div class="forecast-temp">${highTemp}°${getTemperatureUnit() === 'celsius' ? 'C' : 'F'} / ${lowTemp}°${getTemperatureUnit() === 'celsius' ? 'C' : 'F'}</div>
-                <div class="forecast-condition">${condition}</div>
-            </div>
-        `;
-        forecastContainer.appendChild(forecastCard);
-    });
+    forecastContainer.innerHTML = forecastDays
+        .map(day => dailyForecastTemplate(day, unit))
+        .join('');
 }
 
 /**
@@ -516,60 +452,7 @@ function hideRecentSearches() {
     }
 }
 
-// Hamburger menu functionality
-// Toggle mobile menu
-if (hamburgerMenu) {
-    hamburgerMenu.addEventListener('click', () => {
-        hamburgerMenu.classList.toggle('active');
-        mobileMenu.classList.toggle('active');
-    });
-}
 
-// Close mobile menu with X button
-if (closeMenu) {
-    closeMenu.addEventListener('click', () => {
-        hamburgerMenu.classList.remove('active');
-        mobileMenu.classList.remove('active');
-    });
-}
-
-// Close mobile menu when clicking outside
-document.addEventListener('click', (e) => {
-    if (mobileMenu?.classList.contains('active') && 
-        !hamburgerMenu?.contains(e.target) && 
-        !mobileMenu?.contains(e.target)) {
-        hamburgerMenu.classList.remove('active');
-        mobileMenu.classList.remove('active');
-    }
-});
-
-// Sync temperature toggles
-if (unitToggle && unitToggleMobile) {
-    unitToggle.addEventListener('change', () => {
-        unitToggleMobile.checked = unitToggle.checked;
-    });
-
-    unitToggleMobile.addEventListener('change', () => {
-        unitToggle.checked = unitToggleMobile.checked;
-    });
-}
-
-// Handle mobile search form
-const searchFormMobile = document.getElementById('searchFormMobile');
-const searchInputMobile = document.getElementById('searchInputMobile');
-
-if (searchFormMobile && searchInputMobile) {
-    searchFormMobile.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const searchQuery = searchInputMobile.value.trim();
-        if (searchQuery) {
-            searchWeather(searchQuery);
-            searchInputMobile.value = '';
-            hamburgerMenu.classList.remove('active');
-            mobileMenu.classList.remove('active');
-        }
-    });
-}
 
 // Mute button functionality
 function initializeMuteButton() {
@@ -636,7 +519,8 @@ function initializeSearch() {
             e.preventDefault();
             const searchQuery = searchInputMobile.value.trim();
             if (searchQuery) {
-                searchWeather(searchQuery);
+                updateURL(searchQuery);
+                loadWeatherData(searchQuery);
                 searchInputMobile.value = '';
                 hamburgerMenu.classList.remove('active');
                 mobileMenu.classList.remove('active');

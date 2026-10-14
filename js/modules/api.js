@@ -1,5 +1,5 @@
+import { API_KEY } from '../config.js';
 
-const API_KEY = '1fd318216517486e994181149252802';
 const BASE_URL = 'https://api.weatherapi.com/v1';
 
 /**

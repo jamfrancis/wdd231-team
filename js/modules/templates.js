@@ -7,21 +7,27 @@
  * Creates a template for hourly forecast item
  * @param {Object} hour - Hourly forecast data
  * @param {string} unit - Temperature unit ('celsius' or 'fahrenheit')
- * @param {string} timezone - Timezone of the location
  * @param {boolean} isNow - Whether this is the current hour
  * @returns {string} HTML template for hourly forecast
  */
-export function hourlyForecastTemplate(hour, unit, timezone, isNow = false) {
-    const date = new Date(hour.time);
-    const options = {
-        hour: 'numeric',
-        hour12: true,
-        timeZone: timezone
-    };
-    const formattedTime = isNow ? 'Now' : date.toLocaleTimeString('en-US', options);
-    
-    const temp = unit === 'celsius' ? `${Math.round(hour.temp_c)}°C` : `${Math.round(hour.temp_f)}°F`;
-    
+export function hourlyForecastTemplate(hour, unit, isNow = false) {
+    const time = new Date(hour.time);
+    let formattedTime;
+
+    if (isNow) {
+        formattedTime = 'Now';
+    } else {
+        const hours = time.getHours();
+        formattedTime = hours === 0 ? '12 AM' :
+            hours < 12 ? `${hours} AM` :
+            hours === 12 ? '12 PM' :
+            `${hours - 12} PM`;
+    }
+
+    const temp = unit === 'celsius'
+        ? `${Math.round(hour.temp_c)}°C`
+        : `${Math.round(hour.temp_f)}°F`;
+
     return `
         <div class="hour-block">
             <span class="time">${formattedTime}</span>
@@ -32,28 +38,29 @@ export function hourlyForecastTemplate(hour, unit, timezone, isNow = false) {
 }
   
 /**
- * Creates a template for daily forecast item
+ * Creates a template for daily forecast card
  * @param {Object} day - Daily forecast data
  * @param {string} unit - Temperature unit ('celsius' or 'fahrenheit')
- * @returns {string} HTML template for daily forecast
+ * @returns {string} HTML template for daily forecast card
  */
 export function dailyForecastTemplate(day, unit) {
     const date = new Date(day.date);
     const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-    const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    
-    const maxTemp = unit === 'celsius' ? `${day.day.maxtemp_c}°C` : `${day.day.maxtemp_f}°F`;
-    const minTemp = unit === 'celsius' ? `${day.day.mintemp_c}°C` : `${day.day.mintemp_f}°F`;
-    
+    const highTemp = Math.round(unit === 'celsius' ? day.day.maxtemp_c : day.day.maxtemp_f);
+    const lowTemp = Math.round(unit === 'celsius' ? day.day.mintemp_c : day.day.mintemp_f);
+    const unitLabel = unit === 'celsius' ? 'C' : 'F';
+    const condition = day.day.condition.text;
+    const icon = day.day.condition.icon;
+
     return `
-      <div class="forecast-day">
-        <img src="${day.day.condition.icon}" alt="${day.day.condition.text}" width="50">
-        <div class="forecast-details">
-          <div class="forecast-date">${dayName}, ${formattedDate}</div>
-          <div class="forecast-condition">${day.day.condition.text}</div>
-          <div class="forecast-temp">High: ${maxTemp} | Low: ${minTemp}</div>
+        <div class="forecast-card">
+            <div class="forecast-date">${dayName}</div>
+            <img src="${icon}" alt="${condition}" class="forecast-icon">
+            <div class="forecast-details">
+                <div class="forecast-temp">${highTemp}°${unitLabel} / ${lowTemp}°${unitLabel}</div>
+                <div class="forecast-condition">${condition}</div>
+            </div>
         </div>
-      </div>
     `;
 }
   
